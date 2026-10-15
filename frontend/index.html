@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CloudPulse — Managed Database Performance Intelligence Platform</title>
+  <meta name="description" content="Intelligent cloud database performance laboratory for measuring read/write throughput, investigating execution plans, and validating optimizations.">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Chart.js for data visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Left Navigation Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-icon">
+          <img src="assets/logo.svg" alt="CloudPulse Logo" width="30" height="30">
+        </div>
+        <div class="brand-text">
+          <h1>CloudPulse</h1>
+          <div class="brand-tagline">Measure. Optimize. Prove.</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-category">Navigation</div>
+        <a class="nav-link active" data-view="landing" id="nav-landing" onclick="switchView('landing')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          Project Overview
+        </a>
+        <a class="nav-link" data-view="overview" id="nav-overview" onclick="switchView('overview')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          Overview
+        </a>
+        <a class="nav-link" data-view="explorer" id="nav-explorer" onclick="switchView('explorer')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+          Database Explorer
+        </a>
+
+        <div class="nav-category">Performance Engine</div>
+        <a class="nav-link" data-view="benchmark" id="nav-benchmark" onclick="switchView('benchmark')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          Benchmark Studio
+        </a>
+        <a class="nav-link" data-view="optimization" id="nav-optimization" onclick="switchView('optimization')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+          Optimization Lab
+        </a>
+        <a class="nav-link" data-view="queryplan" id="nav-queryplan" onclick="switchView('queryplan')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+          Query Plan Explorer
+        </a>
+        <a class="nav-link" data-view="monitoring" id="nav-monitoring" onclick="switchView('monitoring')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>
+          Cloud Monitoring
+        </a>
+
+        <div class="nav-category">Audit & Governance</div>
+        <a class="nav-link" data-view="history" id="nav-history" onclick="switchView('history')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+          Benchmark History
+        </a>
+        <a class="nav-link" data-view="reports" id="nav-reports" onclick="switchView('reports')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Reports & Exports
+        </a>
+        <a class="nav-link" data-view="logs" id="nav-logs" onclick="switchView('logs')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+          System Logs
+        </a>
+        <a class="nav-link" data-view="settings" id="nav-settings" onclick="switchView('settings')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          Settings
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="demo-wizard-btn" id="btn-open-wizard" onclick="switchView('wizard')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          Judge Demonstration Mode
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <div class="main-wrapper">
+      <!-- Top Navigation Bar -->
+      <header class="topbar">
+        <div class="breadcrumbs">
+          <span>CloudForge 2026</span>
+          <span>/</span>
+          <span>CF-PS-04</span>
+          <span>/</span>
+          <span class="breadcrumb-active" id="breadcrumb-active">Project Overview</span>
+        </div>
+
+        <div class="topbar-actions">
+          <div class="status-badge connected" id="global-db-badge">
+            <span class="status-dot"></span>
+            <span id="global-db-text">PostgreSQL (Connecting...)</span>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="switchView('wizard')">
+            Guided Demo (8 Steps)
+          </button>
+        </div>
+      </header>
+
+      <!-- Content Area -->
+      <main class="content-area">
+        
+        <!-- ==================== TAB 0: LANDING PAGE ==================== -->
+        <div class="tab-pane active" id="tab-landing">
+          <div style="max-width: 1080px; margin: 0 auto; padding: 20px 0;">
+            <!-- Hero Section -->
+            <div style="background: linear-gradient(180deg, #151D26 0%, #0B0F14 100%); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 50px 40px; text-align: center; margin-bottom: 30px; position: relative; overflow: hidden;">
+              <div style="display: inline-block; padding: 4px 14px; background: rgba(0, 214, 160, 0.1); border: 1px solid rgba(0, 214, 160, 0.3); border-radius: 20px; color: var(--primary-emerald); font-weight: 600; font-size: 12px; margin-bottom: 16px;">
+                CloudForge 2026 Hackathon — Problem Code: CF-PS-04
+              </div>
+              <h1 style="font-size: 42px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 12px; color: var(--text-primary);">
+                CloudPulse
+              </h1>
+              <div style="font-size: 20px; color: var(--secondary-cyan); font-weight: 600; margin-bottom: 16px;">
+                Measure. Optimize. Prove.
+              </div>
+              <p style="font-size: 15px; color: var(--text-secondary); max-width: 680px; margin: 0 auto 30px; line-height: 1.6;">
+                An intelligent cloud database performance laboratory that turns real benchmark measurements into actionable optimization insights.
+                Benchmark managed cloud databases, investigate query performance, and validate optimizations using real measurements.
+              </p>
+              <div style="display: flex; justify-content: center; gap: 16px;">
+                <button class="btn btn-primary" id="btn-hero-lab" onclick="switchView('overview')" style="padding: 12px 24px; font-size: 14px;">
+                  Open Performance Lab →
+                </button>
+                <button class="btn btn-secondary" id="btn-hero-arch" onclick="document.getElementById('landing-arch-section')?.scrollIntoView({behavior: 'smooth'})" style="padding: 12px 24px; font-size: 14px;">
+                  Explore Architecture
+                </button>
+              </div>
+            </div>
+
+            <!-- 3 Compact Feature Highlights -->
+            <div class="grid-cols-3">
+              <div class="card">
+                <div class="card-title">Real Benchmarks</div>
+                <div style="color: var(--primary-emerald); font-size: 24px; font-weight: 700; margin-bottom: 8px;">100% Monotonic</div>
+                <p style="color: var(--text-secondary); font-size: 13px;">
+                  Executes repeatable single and concurrent read/write workloads against managed relational tables with microsecond latency precision.
+                </p>
+              </div>
+              <div class="card">
+                <div class="card-title">Explainable Optimization</div>
+                <div style="color: var(--secondary-cyan); font-size: 24px; font-weight: 700; margin-bottom: 8px;">A/B Proving Lab</div>
+                <p style="color: var(--text-secondary); font-size: 13px;">
+                  Investigates EXPLAIN ANALYZE execution plans, applies safe B-Tree indexes, and explains findings honestly, including cache and RAM effects.
+                </p>
+              </div>
+              <div class="card">
+                <div class="card-title">Cloud Monitoring</div>
+                <div style="color: var(--warning-amber); font-size: 24px; font-weight: 700; margin-bottom: 8px;">AWS Telemetry</div>
+                <p style="color: var(--text-secondary); font-size: 13px;">
+                  Integrated CloudWatch dashboard tracking RDS CPU utilization, database connections, and IOPS with verified resource teardown.
+                </p>
+              </div>
+            </div>
+
+            <!-- Architecture Preview Diagram -->
+            <div class="card" id="landing-arch-section" style="margin-bottom: 30px;">
+              <div class="card-title">CloudPulse End-to-End Real-Time Architecture</div>
+              <div class="arch-diagram">
+                <div class="arch-node active">
+                  <div style="color:var(--secondary-cyan); font-size:18px;">🌤️</div>
+                  <div class="arch-node-title">Open-Meteo API</div>
+                  <div class="arch-node-desc">Real-Time External Data</div>
+                </div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-node active">
+                  <div style="color:var(--primary-emerald); font-size:18px;">⚙️</div>
+                  <div class="arch-node-title">FastAPI Backend</div>
+                  <div class="arch-node-desc">Validation & Timing</div>
+                </div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-node active">
+                  <div style="color:var(--warning-amber); font-size:18px;">🗄️</div>
+                  <div class="arch-node-title">AWS RDS PostgreSQL</div>
+                  <div class="arch-node-desc">Managed Database</div>
+                </div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-node active">
+                  <div style="color:var(--primary-emerald); font-size:18px;">📊</div>
+                  <div class="arch-node-title">CloudPulse UI</div>
+                  <div class="arch-node-desc">Performance Dashboard</div>
+                </div>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted);">
+                <span>Pipeline: Open-Meteo ➔ FastAPI Validation ➔ AWS RDS PostgreSQL ➔ Performance Intelligence</span>
+                <span class="panel-tag tag-optimized">Zero Synthetic Data • 100% Real Live Observations</span>
+              </div>
+            </div>
+
+            <!-- 4-Stage Real Data Methodology -->
+            <div class="card">
+              <div class="card-title">Project Engineering Methodology</div>
+              <div class="grid-cols-4" style="margin-bottom: 0;">
+                <div style="background:var(--bg-elevated); padding:14px; border-radius:var(--radius-sm);">
+                  <strong style="color:var(--primary-emerald);">1. Connect</strong>
+                  <p style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Verify AWS RDS PostgreSQL connectivity and engine version.</p>
+                </div>
+                <div style="background:var(--bg-elevated); padding:14px; border-radius:var(--radius-sm);">
+                  <strong style="color:var(--secondary-cyan);">2. Ingest</strong>
+                  <p style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Retrieve real-time observations from Open-Meteo across 8 cities.</p>
+                </div>
+                <div style="background:var(--bg-elevated); padding:14px; border-radius:var(--radius-sm);">
+                  <strong style="color:var(--warning-amber);">3. Benchmark</strong>
+                  <p style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Decompose latency: API network time vs AWS RDS write time.</p>
+                </div>
+                <div style="background:var(--bg-elevated); padding:14px; border-radius:var(--radius-sm);">
+                  <strong style="color:#FF647C);">4. Optimize & Prove</strong>
+                  <p style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Apply composite B-Tree index, compare A/B plans, and analyze.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== TAB 1: OVERVIEW ==================== -->
+        <div class="tab-pane" id="tab-overview">
+          <div class="page-header">
+            <div class="page-title">
+              <h2>Performance Dashboard</h2>
+              <div class="page-subtitle">Real-time AWS RDS telemetry, Open-Meteo pipeline metrics, and database latency decomposition</div>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-primary" id="btn-overview-fetch-live" onclick="handleFetchLiveWeather()">
+                ⚡ Fetch Live Data
+              </button>
+              <button class="btn btn-secondary" onclick="switchView('benchmark')">
+                Launch Benchmark
+              </button>
+            </div>
+          </div>
+
+          <!-- Multi-Stage Latency Decomposition Card -->
+          <div class="card" style="margin-bottom: 24px; background: rgba(0, 214, 160, 0.04); border: 1px solid rgba(0, 214, 160, 0.2);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="status-dot"></span>
+                <strong style="color:var(--primary-emerald); font-size:13px;">MULTI-STAGE INGESTION LATENCY DECOMPOSITION</strong>
+              </div>
+              <span class="panel-tag tag-optimized" id="overview-cloud-badge">AWS RDS PostgreSQL</span>
+            </div>
+            <div class="grid-cols-4" style="margin-bottom: 0;">
+              <div>
+                <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">1. Open-Meteo API Time</div>
+                <div style="font-size:22px; font-weight:700; color:var(--secondary-cyan); font-family:var(--font-mono);" id="kpi-api-latency">-</div>
+                <div style="font-size:11px; color:var(--text-muted);">Public internet round-trip</div>
+              </div>
+              <div>
+                <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">2. Backend Processing</div>
+                <div style="font-size:22px; font-weight:700; color:var(--text-primary); font-family:var(--font-mono);" id="kpi-proc-latency">-</div>
+                <div style="font-size:11px; color:var(--text-muted);">Data validation & parsing</div>
+              </div>
+              <div>
+                <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">3. AWS RDS Database Write</div>
+                <div style="font-size:22px; font-weight:700; color:var(--primary-emerald); font-family:var(--font-mono);" id="kpi-write-latency">-</div>
+                <div style="font-size:11px; color:var(--text-muted);">Managed DB insert time</div>
+              </div>
+              <div>
+                <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">4. Total Request Time</div>
+                <div style="font-size:22px; font-weight:700; color:var(--warning-amber); font-family:var(--font-mono);" id="kpi-total-pipeline">-</div>
+                <div style="font-size:11px; color:var(--text-muted);">End-to-end elapsed</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Real Metrics Grid (Per Step 15) -->
+          <div class="grid-cols-4">
+            <div class="card">
+              <div class="card-title">Live Observations</div>
+              <div class="metric-value" id="kpi-live-obs" style="color:var(--primary-emerald);">0</div>
+              <div class="metric-trend trend-positive">Real Open-Meteo records</div>
+            </div>
+            <div class="card">
+              <div class="card-title">Database Row Count</div>
+              <div class="metric-value" id="kpi-db-rows">0</div>
+              <div class="metric-trend trend-neutral">In `weather_observations`</div>
+            </div>
+            <div class="card">
+              <div class="card-title">Latest Data Timestamp</div>
+              <div class="metric-value" id="kpi-latest-time" style="font-size: 16px; font-family:var(--font-mono);">Awaiting fetch</div>
+              <div class="metric-trend trend-neutral">UTC observation time</div>
+            </div>
+            <div class="card">
+              <div class="card-title">Database Read Latency</div>
+              <div class="metric-value" id="kpi-read-latency">Awaiting benchmark</div>
+              <div class="metric-trend trend-positive">Average SELECT query time</div>
+            </div>
+            <div class="card">
+              <div class="card-title">Database Write Latency</div>
+              <div class="metric-value" id="kpi-db-write-lat">Awaiting benchmark</div>
+              <div class="metric-trend trend-neutral">Managed DB insert latency</div>
+            </div>
+            <div class="card">
+              <div class="card-title">Benchmark Throughput</div>
+              <div class="metric-value" id="kpi-throughput">Awaiting benchmark</div>
+              <div class="metric-trend trend-positive">Completed ops/second</div>
+            </div>
+            <div class="card">
+              <div class="card-title">Error Rate</div>
+              <div class="metric-value" id="kpi-error-rate">0.0%</div>
+              <div class="metric-trend trend-positive">Failed operations / total</div>
+            </div>
+            <div class="card">
+              <div class="card-title">Optimization Improvement</div>
+              <div class="metric-value" id="kpi-opt-improvement" style="color:var(--secondary-cyan);">Awaiting lab</div>
+              <div class="metric-trend trend-neutral">Measured index delta</div>
+            </div>
+          </div>
+
+          <!-- Charts Grid: Latency Trends + Real Temperature by Location -->
+          <div class="grid-cols-2" style="margin-bottom: 24px;">
+            <div class="card">
+              <div class="card-title">Database Query Latency Trends (Avg vs p95 Across Runs)</div>
+              <div style="height: 240px;">
+                <canvas id="chart-overview-latency"></canvas>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">Real-Time Temperatures by Location (°C — Live Open-Meteo)</div>
+              <div style="height: 240px;">
+                <canvas id="chart-weather-temperatures"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive Latency Chart -->
+          <div class="card" style="margin-bottom: 24px;">
+            <div class="card-title">Latency Trends (Avg vs p95 Across Recent Runs)</div>
+            <div style="height: 260px;">
+              <canvas id="chart-overview-latency"></canvas>
+            </div>
+          </div>
+
+          <!-- Recent Activity Table -->
+          <div class="table-container">
+            <div class="table-toolbar">
+              <strong>Recent Database Activity & Audit Trail</strong>
+              <button class="btn btn-secondary btn-sm" onclick="loadOverviewData()">Refresh</button>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width: 120px;">Time (UTC)</th>
+                  <th style="width: 180px;">Event</th>
+                  <th>Description</th>
+                  <th style="width: 100px;">Severity</th>
+                </tr>
+              </thead>
+              <tbody id="overview-activity-body">
+                <tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:20px;">Loading audit events...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ==================== TAB 2: DATABASE EXPLORER ==================== -->
+        <div class="tab-pane" id="tab-explorer">
+          <div class="page-header">
+            <div class="page-title">
+              <h2>Database Explorer — Live Meteorological Telemetry</h2>
+              <div class="page-subtitle">Real-time weather observations automatically retrieved from Open-Meteo into AWS RDS PostgreSQL (weather_observations)</div>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-primary btn-sm" id="btn-fetch-live" onclick="handleFetchLiveWeather()">⚡ FETCH LIVE DATA</button>
+              <button class="btn btn-secondary btn-sm" id="btn-refresh-live" onclick="loadExplorerData(1)">🔄 Refresh Live Data</button>
+              <button class="btn btn-secondary btn-sm" id="btn-verify-count" onclick="handleVerifyCount()">Verify Observation Count</button>
+              <button class="btn btn-danger btn-sm" id="btn-reset-data" onclick="handleResetDataset()">Purge Observations</button>
+            </div>
+          </div>
+
+          <!-- Live Pipeline Latency Decomposition Banner -->
+          <div class="card" style="margin-bottom: 24px; background: rgba(0, 214, 160, 0.04); border: 1px solid rgba(0, 214, 160, 0.2);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="status-dot"></span>
+                <strong style="color:var(--primary-emerald);">Real Data Ingestion Pipeline Status</strong>
+              </div>
+              <span class="panel-tag tag-optimized" id="pipeline-status-badge">Open-Meteo ➔ AWS RDS</span>
+            </div>
+            <div class="grid-cols-4" style="margin-bottom:0;">
+              <div>
+                <div style="font-size:11px; color:var(--text-muted);">Open-Meteo API Network</div>
+                <div style="font-size:18px; font-weight:700; color:var(--secondary-cyan); font-family:var(--font-mono);" id="pipe-api-time">-</div>
+              </div>
+              <div>
+                <div style="font-size:11px; color:var(--text-muted);">Backend Processing & Validation</div>
+                <div style="font-size:18px; font-weight:700; color:var(--text-primary); font-family:var(--font-mono);" id="pipe-proc-time">-</div>
+              </div>
+              <div>
+                <div style="font-size:11px; color:var(--text-muted);">AWS RDS Database Write</div>
+                <div style="font-size:18px; font-weight:700; color:var(--primary-emerald); font-family:var(--font-mono);" id="pipe-db-time">-</div>
+              </div>
+              <div>
+                <div style="font-size:11px; color:var(--text-muted);">Total Pipeline Latency</div>
+                <div style="font-size:18px; font-weight:700; color:var(--warning-amber); font-family:var(--font-mono);" id="pipe-total-time">-</div>
+              </div>
+            </div>
+            <div id="pipe-explanation" style="font-size:12px; color:var(--text-secondary); margin-top:10px; line-height:1.5;">
+              Click <strong>⚡ FETCH LIVE DATA</strong> to contact Open-Meteo, validate observations across the 8 predefined cities, and insert into AWS RDS.
+            </div>
+          </div>
+
+          <!-- Stats Grid -->
+          <div class="grid-cols-4">
+            <div class="card">
+              <div class="card-title">Managed Table Name</div>
+              <div class="metric-value" style="font-size: 18px; font-family:var(--font-mono); color:var(--primary-emerald);">weather_observations</div>
+              <div class="metric-trend trend-neutral">Real meteorological schema</div>
+            </div>
+            <div class="card">
+              <div class="card-title">Total Live Records</div>
+              <div class="metric-value" id="explorer-total-rows">0</div>
+              <div class="metric-trend trend-positive" id="explorer-verify-badge" style="display:none;">VERIFIED</div>
+            </div>
+            <div class="card">
+              <div class="card-title">Table Size</div>
+              <div class="metric-value" id="explorer-table-size">N/A</div>
+              <div class="metric-trend trend-neutral">Physical storage on disk</div>
+            </div>
+            <div class="card">
+              <div class="card-title">Configured Indexes</div>
+              <div class="metric-value" id="explorer-index-count">1</div>
+              <div class="metric-trend trend-neutral">Engine: <span id="explorer-engine-name">PostgreSQL</span></div>
+            </div>
+          </div>
+
+          <!-- Indexes Metadata Card -->
+          <div class="card" style="margin-bottom: 24px;">
+            <div class="card-title">Current Table Indexes (AWS RDS Catalog Inspection)</div>
+            <div id="explorer-index-list">Loading indexes...</div>
+          </div>
+
+          <!-- Data Table -->
+          <div class="table-container">
+            <div class="table-toolbar">
+              <div style="display:flex; gap:12px; align-items:center; width:100%;">
+                <select class="select-input" id="explorer-loc-filter" onchange="loadExplorerData(1)" style="min-width: 280px;">
+                  <option value="ALL">All Predefined Cities (8 Locations)</option>
+                  <option value="Chennai">Chennai (13.0827°N, 80.2707°E)</option>
+                  <option value="Coimbatore">Coimbatore (11.0168°N, 76.9558°E)</option>
+                  <option value="Bengaluru">Bengaluru (12.9716°N, 77.5946°E)</option>
+                  <option value="Hyderabad">Hyderabad (17.3850°N, 78.4867°E)</option>
+                  <option value="Mumbai">Mumbai (19.0760°N, 72.8777°E)</option>
+                  <option value="Delhi">Delhi (28.7041°N, 77.1025°E)</option>
+                  <option value="Kolkata">Kolkata (22.5726°N, 88.3639°E)</option>
+                  <option value="Kochi">Kochi (9.9312°N, 76.2673°E)</option>
+                </select>
+                <span style="font-size:12px; color:var(--text-muted);">Zero manual data entry • Real Open-Meteo observations only</span>
+              </div>
+            </div>
+
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width: 50px;">ID</th>
+                  <th>Location</th>
+                  <th>Temp (°C)</th>
+                  <th>Humidity (%)</th>
+                  <th>Wind (km/h)</th>
+                  <th>Condition</th>
+                  <th>Pressure (hPa)</th>
+                  <th>Cloud Cover</th>
+                  <th>Observation Time (UTC)</th>
+                  <th>Fetched At</th>
+                </tr>
+              </thead>
+              <tbody id="explorer-table-body">
+                <tr><td colspan="10" style="text-align:center; color:var(--text-muted); padding:30px;">Loading real weather observations...</td></tr>
+              </tbody>
+            </table>
+
+            <div class="table-pagination">
+              <span id="explorer-page-info">Page 1 of 1</span>
+              <div style="display:flex; gap:8px;">
+                <button class="btn btn-secondary btn-sm" id="btn-prev-page">Previous</button>
+                <button class="btn btn-secondary btn-sm" id="btn-next-page">Next</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== TAB 3: BENCHMARK STUDIO ==================== -->
+        <div class="tab-pane" id="tab-benchmark">
+          <div class="page-header">
+            <div class="page-title">
+              <h2>Benchmark Studio</h2>
+              <div class="page-subtitle">Configure and execute high-resolution read, write, and mixed workloads</div>
+            </div>
+          </div>
+
+          <!-- Configuration Panel -->
+          <div class="grid-cols-3">
+            <div class="card" style="grid-column: span 2;">
+              <div class="card-title">Benchmark Configuration</div>
+              
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:16px;">
+                <div>
+                  <label style="display:block; font-size:12px; color:var(--text-secondary); margin-bottom:6px;">Benchmark Name</label>
+                  <input type="text" class="search-input" id="bench-name-input" value="Standard Read Benchmark" style="width:100%;">
+                </div>
+                <div>
+                  <label style="display:block; font-size:12px; color:var(--text-secondary); margin-bottom:6px;">Workload Type</label>
+                  <select class="select-input" id="bench-workload-select" style="width:100%;">
+                    <option value="READ">Read Workload (SELECT on weather_observations)</option>
+                    <option value="WRITE">Write Workload (Live Open-Meteo Ingest & AWS RDS Insert)</option>
+                    <option value="MIXED">Mixed Workload (Real SELECTs + Live Ingest)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:16px;">
+                <div>
+                  <label style="display:block; font-size:12px; color:var(--text-secondary); margin-bottom:6px;">Query Template (Weather Dataset)</label>
+                  <select class="select-input" id="bench-query-select" style="width:100%;">
+                    <option value="LOCATION_FILTER">Location Filter (SELECT by location ORDER BY observation_time DESC)</option>
+                    <option value="LATEST_OBSERVATIONS">Latest Observations (SELECT ORDER BY observation_time DESC)</option>
+                    <option value="WEATHER_SCAN">Weather Scan (Filter by Temp & Humidity)</option>
+                    <option value="AGGREGATE">Aggregated Summary (GROUP BY location_name)</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="display:block; font-size:12px; color:var(--text-secondary); margin-bottom:6px;">Operation Count</label>
+                  <input type="number" class="search-input" id="bench-ops-input" value="100" min="10" max="5000" style="width:100%;">
+                </div>
+              </div>
+
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:20px;">
+                <div>
+                  <label style="display:block; font-size:12px; color:var(--text-secondary); margin-bottom:6px;">Concurrency (Worker Threads: 1 - 20)</label>
+                  <input type="number" class="search-input" id="bench-concurrency-input" value="1" min="1" max="20" style="width:100%;">
+                </div>
+                <div>
+                  <label style="display:block; font-size:12px; color:var(--text-secondary); margin-bottom:6px;">Warm-up Operations (Prime Buffer Cache)</label>
+                  <input type="number" class="search-input" id="bench-warmup-input" value="10" min="0" max="50" style="width:100%;">
+                </div>
+              </div>
+
+              <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border-color); padding-top:16px;">
+                <div style="display:flex; gap:8px;">
+                  <span style="font-size:12px; color:var(--text-muted); align-self:center;">Presets:</span>
+                  <button class="btn btn-secondary btn-sm preset-btn active" data-ops="100">Quick (100)</button>
+                  <button class="btn btn-secondary btn-sm preset-btn" data-ops="500">Standard (500)</button>
+                  <button class="btn btn-secondary btn-sm preset-btn" data-ops="1000">Extended (1,000)</button>
+                </div>
+
+                <div style="display:flex; gap:10px;">
+                  <button class="btn btn-danger btn-sm" id="btn-cancel-bench" onclick="handleCancelBenchmark()" style="display:none;">Cancel</button>
+                  <button class="btn btn-primary" id="btn-launch-bench" onclick="handleLaunchBenchmark()">
+                    ⚡ Execute Benchmark
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Methodology Card -->
+            <div class="card">
+              <div class="card-title">Repeatability & Timing</div>
+              <ul style="color:var(--text-secondary); font-size:13px; line-height:1.7; padding-left:18px;">
+                <li>High-resolution <code>time.perf_counter()</code> monotonic timer.</li>
+                <li>Warm-up operations ensure disk buffers are consistently primed.</li>
+                <li>Isolated thread pool prevents API request starvation.</li>
+                <li>Captures starting and final row counts to verify test integrity.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Live Progress Banner -->
+          <div id="bench-running-banner" style="display:none; background:var(--bg-elevated); border:1px solid var(--primary-emerald); border-radius:var(--radius-md); padding:20px; margin-bottom:24px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <div>
+                <strong style="color:var(--primary-emerald);">Benchmark In Progress...</strong>
+                <span style="color:var(--text-muted); font-size:12px; margin-left:10px;">Measuring database response times</span>
+              </div>
+              <div style="font-family:var(--font-mono); color:var(--secondary-cyan); font-weight:700;" id="bench-stopwatch">0.0s</div>
+            </div>
+            <div style="width:100%; height:8px; background:var(--bg-main); border-radius:4px; overflow:hidden;">
+              <div id="bench-progress-bar" style="width:0%; height:100%; background:var(--primary-emerald); transition:width 0.3s ease;"></div>
+            </div>
+            <div style="text-align:right; font-size:11px; color:var(--text-muted); margin-top:6px;" id="bench-progress-text">0%</div>
+          </div>
+
+          <!-- Benchmark Results Container -->
+          <div id="bench-results-container" style="display:none;">
+            <div class="page-title" style="margin-bottom:16px;">
+              <h3>Benchmark Results & Distribution</h3>
+            </div>
+
+            <div class="grid-cols-4">
+              <div class="card">
+                <div class="card-title">Average Latency</div>
+                <div class="metric-value" id="res-avg-latency" style="color:var(--primary-emerald);">0.00 ms</div>
+                <div class="metric-trend trend-positive">Mean operation time</div>
+              </div>
+              <div class="card">
+                <div class="card-title">Median (p50) Latency</div>
+                <div class="metric-value" id="res-median-latency">0.00 ms</div>
+                <div class="metric-trend trend-positive">Typical query speed</div>
+              </div>
+              <div class="card">
+                <div class="card-title">p95 Tail Latency</div>
+                <div class="metric-value" id="res-p95-latency">0.00 ms</div>
+                <div class="metric-trend trend-neutral">95% of queries under this</div>
+              </div>
+              <div class="card">
+                <div class="card-title">Throughput</div>
+                <div class="metric-value" id="res-throughput">0.0 ops/s</div>
+                <div class="metric-trend trend-positive">Completed ops/second</div>
+              </div>
+              <div class="card">
+                <div class="card-title">Minimum Latency</div>
+                <div class="metric-value" id="res-min-latency">0.00 ms</div>
+                <div class="metric-trend trend-neutral">Best observed time</div>
+              </div>
+              <div class="card">
+                <div class="card-title">Maximum Latency</div>
+                <div class="metric-value" id="res-max-latency">0.00 ms</div>
+                <div class="metric-trend trend-neutral">Worst outlier time</div>
+              </div>
+              <div class="card">
+                <div class="card-title">p99 Latency</div>
+                <div class="metric-value" id="res-p99-latency">0.00 ms</div>
+                <div class="metric-trend trend-neutral">99th percentile</div>
+              </div>
+              <div class="card">
+                <div class="card-title">Error Rate</div>
+                <div class="metric-value" id="res-error-rate">0.0%</div>
+                <div class="metric-trend trend-neutral">Failures / Attempted</div>
+              </div>
+            </div>
+
+            <!-- Latency Distribution Chart -->
+            <div class="card" style="margin-bottom:24px;">
+              <div class="card-title">Latency Percentile Breakdown</div>
+              <div style="height: 240px;">
+                <canvas id="chart-bench-distribution"></canvas>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted); margin-top:12px;">
+                <span id="res-row-verification">Row count verified</span>
+                <span>Total Elapsed: <strong id="res-total-time">0 ms</strong></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== TAB 4: OPTIMIZATION LAB ==================== -->
+        <div class="tab-pane" id="tab-optimization">
+          <div class="page-header">
+            <div class="page-title">
+              <h2>Optimization Lab — Before & After Proving Ground</h2>
+              <div class="page-subtitle">Evaluate safe database improvements (B-Tree indexes) and prove performance deltas</div>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-secondary btn-sm" id="btn-apply-manual-idx" onclick="handleApplyManualIndex()">Create Index</button>
+              <button class="btn btn-danger btn-sm" id="btn-rollback-manual-idx" onclick="handleRollbackManualIndex()">Remove Test Index</button>
+              <button class="btn btn-primary" id="btn-run-ab-experiment" onclick="handleRunOptimizationExperiment()">
+                Run A/B Optimization Experiment
+              </button>
+            </div>
+          </div>
+
+          <!-- Scenario Card -->
+          <div class="card" style="margin-bottom:24px;">
+            <div class="card-title">Representative Target Workload Scenario</div>
+            <p style="color:var(--text-secondary); font-size:13px; margin-bottom:12px;">
+              Filtered temporal lookup on <code>weather_observations</code> selecting recent observations for a specific location.
+              Evaluates the performance transition between unindexed full table scans and targeted composite B-Tree index scans.
+            </p>
+            <div class="code-box">SELECT id, location_name, temperature, relative_humidity, wind_speed, observation_time FROM weather_observations WHERE location_name = 'Chennai' ORDER BY observation_time DESC LIMIT 20;</div>
+            <div style="font-size:12px; color:var(--text-muted); margin-top:8px;">
+              Target Optimization: <code>CREATE INDEX idx_weather_loc_time ON weather_observations (location_name, observation_time DESC);</code>
+            </div>
+          </div>
+
+          <!-- Results Split-Screen -->
+          <div id="opt-results-section" style="display:none;">
+            <div class="split-screen">
+              <!-- Left: Baseline -->
+              <div class="split-panel baseline">
+                <div class="panel-header">
+                  <div>
+                    <h4 style="font-size:15px; font-weight:700;">Baseline (Pre-Index)</h4>
+                    <span style="font-size:12px; color:var(--text-muted);">Unindexed Sequential Scan</span>
+                  </div>
+                  <span class="panel-tag tag-baseline">BASELINE</span>
+                </div>
+                <div style="margin-bottom:16px;">
+                  <div style="font-size:12px; color:var(--text-muted);">Average Latency</div>
+                  <div style="font-size:26px; font-weight:700; color:var(--warning-amber); font-family:var(--font-mono);" id="opt-baseline-lat">0.00 ms</div>
+                </div>
+                <div>
+                  <div style="font-size:12px; color:var(--text-muted);">Planner Scan Type</div>
+                  <div style="font-size:14px; font-weight:600; color:var(--text-primary);" id="opt-baseline-scan">Seq Scan</div>
+                </div>
+              </div>
+
+              <!-- Right: Optimized -->
+              <div class="split-panel optimized">
+                <div class="panel-header">
+                  <div>
+                    <h4 style="font-size:15px; font-weight:700;">Optimized (Post-Index)</h4>
+                    <span style="font-size:12px; color:var(--text-muted);">Composite B-Tree Index Scan</span>
+                  </div>
+                  <span class="panel-tag tag-optimized">OPTIMIZED</span>
+                </div>
+                <div style="margin-bottom:16px;">
+                  <div style="font-size:12px; color:var(--text-muted);">Average Latency</div>
+                  <div style="font-size:26px; font-weight:700; color:var(--primary-emerald); font-family:var(--font-mono);" id="opt-optimized-lat">0.00 ms</div>
+                </div>
+                <div>
+                  <div style="font-size:12px; color:var(--text-muted);">Planner Scan Type</div>
+                  <div style="font-size:14px; font-weight:600; color:var(--text-primary);" id="opt-optimized-scan">Index Scan</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Comparison Summary Cards -->
+            <div class="grid-cols-2">
+              <div class="card">
+                <div class="card-title">Measured Latency Reduction</div>
+                <div class="metric-value" id="opt-lat-delta">0.0%</div>
+                <div class="metric-trend trend-positive">Formula: ((Baseline - Optimized) / Baseline) × 100</div>
+              </div>
+              <div class="card">
+                <div class="card-title">Throughput Delta</div>
+                <div class="metric-value" id="opt-thru-delta">0.0%</div>
+                <div class="metric-trend trend-positive">Completed operations/sec increase</div>
+              </div>
+            </div>
+
+            <!-- Comparison Chart -->
+            <div class="card" style="margin-bottom:24px;">
+              <div class="card-title">Latency Comparison (Lower is Better)</div>
+              <div style="height:220px;">
+                <canvas id="chart-opt-comparison"></canvas>
+              </div>
+            </div>
+
+            <!-- Honest Engineering Analysis Box -->
+            <div class="card">
+              <div class="card-title">Honest Database Engineering Analysis</div>
+              <div id="opt-analysis-box" style="font-size:13px; color:var(--text-secondary); line-height:1.7;">
+                Executing analysis...
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== TAB 5: QUERY PLAN EXPLORER ==================== -->
+        <div class="tab-pane" id="tab-queryplan">
+          <div class="page-header">
+            <div class="page-title">
+              <h2>Query Plan Explorer</h2>
+              <div class="page-subtitle">Inspect actual database planner execution costs, scan types, and tree nodes</div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:24px;">
+            <div class="card-title">Query Plan Selector</div>
+            <div style="display:flex; gap:16px; align-items:center;">
+              <select class="select-input" id="qp-query-type-select" style="min-width:260px;">
+                <option value="LOCATION_FILTER">Location Filter (SELECT by location ORDER BY observation_time DESC)</option>
+                <option value="LATEST_OBSERVATIONS">Latest Observations (SELECT ORDER BY observation_time DESC)</option>
+                <option value="WEATHER_SCAN">Weather Scan (Filter by Temp & Humidity)</option>
+                <option value="AGGREGATE">Aggregate GROUP BY (Climate Summary)</option>
+              </select>
+              <input type="text" class="search-input" id="qp-filter-input" value="Chennai" placeholder="Location name...">
+              <label style="display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer;">
+                <input type="checkbox" id="qp-analyze-check" checked>
+                <span>ANALYZE (Execute & measure real timings)</span>
+              </label>
+              <button class="btn btn-primary btn-sm" id="btn-run-explain" onclick="handleExplainQuery()">Execute EXPLAIN</button>
+            </div>
+          </div>
+
+          <div class="grid-cols-3">
+            <div class="card">
+              <div class="card-title">Scan Type Node</div>
+              <div class="metric-value" id="qp-scan-type" style="font-size:20px; color:var(--primary-emerald);">Seq Scan</div>
+              <div class="metric-trend trend-neutral">Execution access method</div>
+            </div>
+            <div class="card">
+              <div class="card-title">Estimated Total Cost</div>
+              <div class="metric-value" id="qp-cost">0.0</div>
+              <div class="metric-trend trend-neutral">Planner cost estimation units</div>
+            </div>
+            <div class="card">
+              <div class="card-title">Actual Total Time</div>
+              <div class="metric-value" id="qp-exec-time">0.0 ms</div>
+              <div class="metric-trend trend-neutral">Monitored database engine execution</div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:24px;">
+            <div class="card-title">Plain Language Plan Explanation</div>
+            <div id="qp-explanation" style="font-size:13px; color:var(--text-secondary); line-height:1.6;">
+              Select a query and click Execute EXPLAIN.
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:24px;">
+            <div class="card-title">Target SQL Query</div>
+            <div class="code-box" id="qp-sql-display">-- Query will appear here</div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Raw Database Execution Plan Output</div>
+            <div class="code-box" id="qp-plan-display">-- Execution plan will appear here</div>
+          </div>
+        </div>
+
+        <!-- ==================== TAB 6: CLOUD MONITORING ==================== -->
+        <div class="tab-pane" id="tab-monitoring">
+          <div class="page-header">
+            <div class="page-title">
+              <h2>Cloud Monitoring — AWS RDS & CloudWatch</h2>
+              <div class="page-subtitle">Live infrastructure metrics, DB connections, and telemetry from AWS CloudWatch</div>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="loadMonitoringView()">Refresh Metrics</button>
+          </div>
+
+          <!-- Environment status bar -->
+          <div class="card" style="margin-bottom:24px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <span id="cw-mode-badge" class="panel-tag tag-optimized">AWS CLOUDWATCH</span>
+              <span style="font-size:13px; color:var(--text-muted); margin-left:12px;">RDS Instance: <strong id="cw-instance-id" style="color:var(--text-primary); font-family:var(--font-mono);">cloudpulse-rds-pg-dev</strong></span>
+            </div>
+            <div style="font-size:12px; color:var(--text-muted);">
+              Region: <strong id="cw-region" style="color:var(--secondary-cyan);">us-east-1</strong> | Last Updated: <span id="cw-last-updated" style="font-family:var(--font-mono);">Now</span>
+            </div>
+          </div>
+
+          <!-- Charts Grid -->
+          <div class="grid-cols-2">
+            <div class="card">
+              <div class="card-title">CPU Utilization (%)</div>
+              <div style="height:220px;">
+                <canvas id="chart-cw-cpu"></canvas>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">Database IOPS (Read vs Write)</div>
+              <div style="height:220px;">
+                <canvas id="chart-cw-iops"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== TAB 7: BENCHMARK HISTORY ==================== -->
+        <div class="tab-pane" id="tab-history">
+          <div class="page-header">
+            <div class="page-title">
+              <h2>Benchmark Execution History</h2>
+              <div class="page-subtitle">Persistent repository of all previous benchmark workloads and configurations</div>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="loadHistoryView()">Refresh History</button>
+          </div>
+
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Run ID</th>
+                  <th>Benchmark Name</th>
+                  <th>Workload</th>
+                  <th>Ops</th>
+                  <th>Avg Latency</th>
+                  <th>p95 Latency</th>
+                  <th>Throughput</th>
+                  <th>Optimization</th>
+                </tr>
+              </thead>
+              <tbody id="history-table-body">
+                <tr><td colspan="8" style="text-align:center; color:var(--text-muted); padding:30px;">Loading persisted benchmark runs...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ==================== TAB 8: REPORTS & EXPORTS ==================== -->
+        <div class="tab-pane" id="tab-reports">
+          <div class="page-header">
+            <div class="page-title">
+              <h2>Performance Reports & Audit Export</h2>
+              <div class="page-subtitle">Generate exportable audit documentation for hackathon submission and DevOps records</div>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <select class="select-input" id="report-format-select">
+                <option value="markdown">Markdown (.md)</option>
+                <option value="json">JSON (.json)</option>
+                <option value="csv">CSV (.csv)</option>
+              </select>
+              <button class="btn btn-primary" id="btn-download-report">
+                📥 Download Audit Report
+              </button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Audit Report Preview</div>
+            <div class="code-box" id="report-preview-box" style="max-height:500px; color:#F3F7FB;">Generating report preview...</div>
+          </div>
+        </div>
+
+        <!-- ==================== TAB 9: SYSTEM LOGS ==================== -->
+        <div class="tab-pane" id="tab-logs">
+          <div class="page-header">
+            <div class="page-title">
+              <h2>System Logs & Structured Events</h2>
+              <div class="page-subtitle">Real-time backend execution stream, SQL queries, and audit events</div>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <select class="select-input" id="log-sev-filter">
+                <option value="ALL">All Severities</option>
+                <option value="INFO">INFO</option>
+                <option value="WARN">WARN</option>
+                <option value="ERROR">ERROR</option>
+              </select>
+              <select class="select-input" id="log-evt-filter">
+                <option value="ALL">All Events</option>
+                <option value="APP_START">APP_START</option>
+                <option value="BENCHMARK_START">BENCHMARK_START</option>
+                <option value="BENCHMARK_COMPLETE">BENCHMARK_COMPLETE</option>
+                <option value="DATA_SEED">DATA_SEED</option>
+                <option value="INDEX_APPLIED">INDEX_APPLIED</option>
+                <option value="TEARDOWN">TEARDOWN</option>
+              </select>
+              <button class="btn btn-secondary btn-sm" id="btn-refresh-logs">Refresh</button>
+              <button class="btn btn-danger btn-sm" id="btn-clear-logs">Clear Buffer</button>
+            </div>
+          </div>
+
+          <div class="card" style="background:#070B0E; padding:16px;">
+            <div id="system-logs-container" style="max-height:550px; overflow-y:auto;">
+              Loading system logs...
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== TAB 10: SETTINGS ==================== -->
+        <div class="tab-pane" id="tab-settings">
+          <div class="page-header">
+            <div class="page-title">
+              <h2>Settings & Connection Management</h2>
+              <div class="page-subtitle">Cloud database connection strings, AWS configuration, and resource safeguards</div>
+            </div>
+          </div>
+
+          <div class="grid-cols-2">
+            <!-- DB Config -->
+            <div class="card">
+              <div class="card-title">Database Settings</div>
+              <div style="margin-bottom:12px;">
+                <span style="font-size:12px; color:var(--text-muted);">Configured Environment:</span>
+                <div style="font-weight:600; font-size:14px;" id="set-env-name">Local Development</div>
+              </div>
+              <div style="margin-bottom:12px;">
+                <span style="font-size:12px; color:var(--text-muted);">Database Target:</span>
+                <div style="font-family:var(--font-mono); font-size:13px; color:var(--secondary-cyan);" id="set-db-url">sqlite:///./cloudpulse.db</div>
+              </div>
+              <div>
+                <span style="font-size:12px; color:var(--text-muted);">Max Allowed Benchmark Operations:</span>
+                <div style="font-weight:600; font-size:14px;" id="set-max-ops">5,000</div>
+              </div>
+            </div>
+
+            <!-- AWS Cloud Config -->
+            <div class="card">
+              <div class="card-title">AWS Cloud Integration</div>
+              <div style="margin-bottom:12px;">
+                <span style="font-size:12px; color:var(--text-muted);">AWS Region:</span>
+                <div style="font-weight:600; font-size:14px;" id="set-aws-region">us-east-1</div>
+              </div>
+              <div style="margin-bottom:12px;">
+                <span style="font-size:12px; color:var(--text-muted);">RDS DB Instance Identifier:</span>
+                <div style="font-family:var(--font-mono); font-size:13px;" id="set-aws-rds-id">cloudpulse-rds-pg-dev</div>
+              </div>
+              <div>
+                <span style="font-size:12px; color:var(--text-muted);">CloudWatch IAM Credentials:</span>
+                <div style="font-weight:600; font-size:14px;" id="set-aws-creds">Simulated (Local Mode)</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Danger Zone -->
+          <div class="card" style="border-color:rgba(255,100,124,0.4); margin-top:24px;">
+            <div class="card-title" style="color:var(--error-red);">Danger Zone — Resource Teardown & Purge</div>
+            <p style="font-size:13px; color:var(--text-secondary); margin-bottom:16px;">
+              Clean up temporary database objects and indexes after hackathon benchmark experiments.
+            </p>
+            <div style="display:flex; gap:12px;">
+              <button class="btn btn-danger btn-sm" onclick="handleResetDataset()">Purge All Benchmark Records</button>
+              <button class="btn btn-danger btn-sm" onclick="handleCleanupResources()">Drop Test Schema & Indexes</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== TAB 11: JUDGE DEMONSTRATION WIZARD ==================== -->
+        <div class="tab-pane" id="tab-wizard">
+          <div class="page-header">
+            <div class="page-title">
+              <h2>Judge Demonstration Mode (8 Steps)</h2>
+              <div class="page-subtitle">Guided step-by-step evaluation workflow satisfying all CF-PS-04 hackathon requirements</div>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="switchView('overview')">Exit Demonstration Mode</button>
+          </div>
+
+          <!-- Progress Nodes -->
+          <div class="wizard-progress">
+            <div class="wizard-step-node active" data-step="1">
+              <div class="step-circle">1</div>
+              <div class="step-label">AWS RDS Status</div>
+            </div>
+            <div class="wizard-step-node" data-step="2">
+              <div class="step-circle">2</div>
+              <div class="step-label">Live Ingest</div>
+            </div>
+            <div class="wizard-step-node" data-step="3">
+              <div class="step-circle">3</div>
+              <div class="step-label">Read Bench</div>
+            </div>
+            <div class="wizard-step-node" data-step="4">
+              <div class="step-circle">4</div>
+              <div class="step-label">Write Bench</div>
+            </div>
+            <div class="wizard-step-node" data-step="5">
+              <div class="step-circle">5</div>
+              <div class="step-label">Query Plan</div>
+            </div>
+            <div class="wizard-step-node" data-step="6">
+              <div class="step-circle">6</div>
+              <div class="step-label">Apply Index</div>
+            </div>
+            <div class="wizard-step-node" data-step="7">
+              <div class="step-circle">7</div>
+              <div class="step-label">Before vs After</div>
+            </div>
+            <div class="wizard-step-node" data-step="8">
+              <div class="step-circle">8</div>
+              <div class="step-label">Audit Report</div>
+            </div>
+          </div>
+
+          <!-- Step Panels -->
+          <div class="card" style="min-height:300px;">
+            <!-- Step 1 -->
+            <div class="wizard-step-panel" data-step="1">
+              <h3 style="font-size:18px; color:var(--text-primary); margin-bottom:10px;">STEP 1 — VERIFY MANAGED DATABASE STATUS</h3>
+              <p style="color:var(--text-secondary); font-size:13px; margin-bottom:20px;">
+                Executes an active ping test against the configured AWS RDS PostgreSQL / local instance, measuring network latency, pool status, and PostgreSQL engine version.
+              </p>
+              <button class="btn btn-primary btn-wizard-action" data-step="1">Ping Database Connection</button>
+              <div class="code-box" id="wizard-output-step-1" style="display:none; margin-top:16px;"></div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="wizard-step-panel" data-step="2" style="display:none;">
+              <h3 style="font-size:18px; color:var(--text-primary); margin-bottom:10px;">STEP 2 — INGEST REAL-TIME WEATHER TELEMETRY</h3>
+              <p style="color:var(--text-secondary); font-size:13px; margin-bottom:20px;">
+                Requests current weather observations from Open-Meteo API across 8 predefined cities, validates payloads, and inserts into AWS RDS PostgreSQL with duplicate prevention.
+              </p>
+              <button class="btn btn-primary btn-wizard-action" data-step="2">⚡ Fetch Live Data from Open-Meteo</button>
+              <div class="code-box" id="wizard-output-step-2" style="display:none; margin-top:16px;"></div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="wizard-step-panel" data-step="3" style="display:none;">
+              <h3 style="font-size:18px; color:var(--text-primary); margin-bottom:10px;">STEP 3 — RUN READ BENCHMARK</h3>
+              <p style="color:var(--text-secondary); font-size:13px; margin-bottom:20px;">
+                Executes high-resolution SELECT queries on the real <code>weather_observations</code> table in AWS RDS, measuring min, average, median, p95, and throughput.
+              </p>
+              <button class="btn btn-primary btn-wizard-action" data-step="3">Run Read Benchmark (50 ops)</button>
+              <div class="code-box" id="wizard-output-step-3" style="display:none; margin-top:16px;"></div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="wizard-step-panel" data-step="4" style="display:none;">
+              <h3 style="font-size:18px; color:var(--text-primary); margin-bottom:10px;">STEP 4 — RUN WRITE BENCHMARK WITH LATENCY DECOMPOSITION</h3>
+              <p style="color:var(--text-secondary); font-size:13px; margin-bottom:20px;">
+                Obtains fresh live data from Open-Meteo, inserts into AWS RDS, and isolates external API network latency vs actual database write time.
+              </p>
+              <button class="btn btn-primary btn-wizard-action" data-step="4">Run Write Benchmark (Live Ingestion)</button>
+              <div class="code-box" id="wizard-output-step-4" style="display:none; margin-top:16px;"></div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="wizard-step-panel" data-step="5" style="display:none;">
+              <h3 style="font-size:18px; color:var(--text-primary); margin-bottom:10px;">STEP 5 — CAPTURE BASELINE QUERY PLAN</h3>
+              <p style="color:var(--text-secondary); font-size:13px; margin-bottom:20px;">
+                Runs <code>EXPLAIN ANALYZE</code> on a temporal location query, capturing planner node type (Seq Scan) and execution time.
+              </p>
+              <button class="btn btn-primary btn-wizard-action" data-step="5">Inspect Baseline EXPLAIN ANALYZE Plan</button>
+              <div class="code-box" id="wizard-output-step-5" style="display:none; margin-top:16px;"></div>
+            </div>
+
+            <!-- Step 6 -->
+            <div class="wizard-step-panel" data-step="6" style="display:none;">
+              <h3 style="font-size:18px; color:var(--text-primary); margin-bottom:10px;">STEP 6 — APPLY COMPOSITE B-TREE INDEX</h3>
+              <p style="color:var(--text-secondary); font-size:13px; margin-bottom:20px;">
+                Safely creates the composite index <code>idx_weather_loc_time</code> on <code>weather_observations (location_name, observation_time DESC)</code>.
+              </p>
+              <button class="btn btn-primary btn-wizard-action" data-step="6">Create Index (idx_weather_loc_time)</button>
+              <div class="code-box" id="wizard-output-step-6" style="display:none; margin-top:16px;"></div>
+            </div>
+
+            <!-- Step 7 -->
+            <div class="wizard-step-panel" data-step="7" style="display:none;">
+              <h3 style="font-size:18px; color:var(--text-primary); margin-bottom:10px;">STEP 7 — PROVE BEFORE VS AFTER & HONEST ANALYSIS</h3>
+              <p style="color:var(--text-secondary); font-size:13px; margin-bottom:20px;">
+                Reruns the exact same query with the index active, compares baseline vs optimized latency, and renders honest engineering findings.
+              </p>
+              <button class="btn btn-primary btn-wizard-action" data-step="7">Execute Optimized Run & Compare</button>
+              <div class="code-box" id="wizard-output-step-7" style="display:none; margin-top:16px;"></div>
+            </div>
+
+            <!-- Step 8 -->
+            <div class="wizard-step-panel" data-step="8" style="display:none;">
+              <h3 style="font-size:18px; color:var(--text-primary); margin-bottom:10px;">STEP 8 — GENERATE PERFORMANCE AUDIT REPORT</h3>
+              <p style="color:var(--text-secondary); font-size:13px; margin-bottom:20px;">
+                Generates and downloads the final performance report summarizing real Open-Meteo observations, AWS RDS PostgreSQL performance, and optimization findings.
+              </p>
+              <button class="btn btn-primary btn-wizard-action" data-step="8">Generate Final Audit Report</button>
+              <div class="code-box" id="wizard-output-step-8" style="display:none; margin-top:16px;"></div>
+            </div>
+          </div>
+
+          <!-- Wizard Controls Footer -->
+          <div style="display:flex; justify-content:space-between; margin-top:20px;">
+            <button class="btn btn-secondary" id="btn-wizard-prev" disabled>← Previous Step</button>
+            <button class="btn btn-primary" id="btn-wizard-next">Next Step →</button>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Notification Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Main Application Script -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
