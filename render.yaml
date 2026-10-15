@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: cloudpulse
+    runtime: python
+    region: singapore
+    plan: free
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: cd backend && python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: AWS_REGION
+        value: ap-southeast-2
+      - key: AWS_RDS_INSTANCE_ID
+        value: database-1
+      - key: ENVIRONMENT
+        value: production
